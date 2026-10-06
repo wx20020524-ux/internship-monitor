@@ -1,0 +1,28 @@
+{
+  "Code": 200,
+  "Data": {
+    "Count": 1,
+    "Posts": [
+      {
+        "Id": 0,
+        "PostId": "2074746946387623936",
+        "RecruitPostId": 121021,
+        "RecruitPostName": "腾讯战略发展部-高级商业分析师-AI方向",
+        "CountryName": "中国",
+        "LocationName": "深圳",
+        "BGName": "CDG",
+        "ComCode": "",
+        "ComName": "",
+        "ProductName": "公共",
+        "CategoryName": "战略与投资",
+        "Responsibility": "1.分析AI领域的前沿技术、产品机会和探索商业模式；\r\n2.对游戏、电商、视频、社交、效率工具等应用领域深入洞察，协助业务明确目标及规划相关资源，为业务团队提供发展建议；\r\n3.监测市场行业数据、竞争对手动态，对重点公司/业务情况进行深入分析，寻找业务提升的潜在机会点；\r\n4.作为PMO，横向协同业务各部门，为战略性攻坚方向、战略性项目的实施落地负责。",
+        "LastUpdateTime": "2026年09月07日",
+        "PostURL": "http://careers.tencent.com/jobdesc.html?postId=2074746946387623936",
+        "SourceID": 1,
+        "IsCollect": false,
+        "IsValid": true,
+        "RequireWorkYearsName": "一年以上工作经验"
+      }
+    ]
+  }
+}

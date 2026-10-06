@@ -1,0 +1,97 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: internship-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}"
+      MYSQL_DATABASE: internship_monitor
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 5s
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: internship-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 5s
+      retries: 10
+      interval: 5s
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: internship-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: "${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}"
+      MYSQL_DATABASE: internship_monitor
+      REDIS_URL: redis://redis:6379/0
+      LLM_BASE_URL: "${LLM_BASE_URL:-}"
+      LLM_API_KEY: "${LLM_API_KEY:-}"
+      LLM_MODEL: "${LLM_MODEL:-}"
+      EMBEDDING_MODEL: "${EMBEDDING_MODEL:-text-embedding-v4}"
+      EMBEDDING_DIMENSION: "${EMBEDDING_DIMENSION:-1024}"
+      MONITOR_INTERVAL_SECONDS: "${MONITOR_INTERVAL_SECONDS:-300}"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  monitor-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: internship-monitor-worker
+    restart: unless-stopped
+    command: ["python", "-m", "src.monitor.worker"]
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: root
+      MYSQL_PASSWORD: "${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}"
+      MYSQL_DATABASE: internship_monitor
+      REDIS_URL: redis://redis:6379/0
+      MONITOR_INTERVAL_SECONDS: "${MONITOR_INTERVAL_SECONDS:-300}"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: internship-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
+  redis_data:

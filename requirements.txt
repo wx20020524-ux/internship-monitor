@@ -1,0 +1,11 @@
+httpx
+pydantic
+pymysql
+python-dotenv
+playwright==1.63.0
+fastapi
+uvicorn
+pypdf
+python-docx
+python-multipart
+redis>=5,<7
